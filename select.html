@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>select获取文本事件</title>
+</head>
+<body>
+<form method="post" id="myForm">
+    <input type="text" name="textboxFirst" value="red">
+    <input type="text" name="textboxSecond" value="green">
+    <input type="text" name="textboxThird" value="Hello world!">
+    <a href = "chooseInput.html">过滤输入</a>
+</form>
+</body>
+<script>
+    //对于textbox1进行文本获取
+    var textbox = document.forms[0].elements["textboxFirst"];
+    textbox.addEventListener( "select", function(event){
+        alert("Text selected:" + getSelectedText(textbox));
+    });
+    /*
+     获取选中的文本
+     */
+    function getSelectedText(textbox){
+        //selectionStart 和 selectionEnd。这两个属性中保存的是基于 0 的数值，表示所选择文本的范围（即文本选区开头和结尾的偏移量）
+        //IE9+、 Firefox、 Safari、 Chrome 和 Opera 都支持这两个属性。 IE8 及之前版本不支持这两个属性
+        if (typeof textbox.selectionStart == "number"){
+            return textbox.value.substring(textbox.selectionStart,
+                    textbox.selectionEnd);
+        } else if (document.selection){
+            //IE8 及之前版本
+            return document.selection.createRange().text;
+        }
+    }
+    //对于textbox2进行文本选择
+    var textboxSecond = document.forms[0].elements["textboxSecond"];
+    textboxSecond.addEventListener("focus", function(event){
+        event = event?event:window.event;
+        var target = event.target||event.srcElement;
+        target.select();
+
+    });
+    //对textbox3获取部分文本
+    var textboxThird = document.forms[0].elements["textboxThird"];
+    /*
+     获取部分文本
+     */
+    function selectText(textbox, startIndex, stopIndex){
+        //IE9、 Firefox、 Safari、 Chrome 和 Opera
+        if(textbox.setSelectionRange){
+            //setSelectionRange()方法。
+            //这个方法接收两个参数：要选择的第一个字符的索引和要选择的最后一个字符之后的字符的索引（类似于 substring()方法的两个参数）
+            textbox.setSelectionRange(startIndex, stopIndex);
+        } else if (textbox.createTextRange){
+            //IE8 及之前版本
+            var range = textbox.createTextRange();
+            //使用 collapse()将范围折叠到文本框的开始位置
+            range.collapse(true);
+            //moveStart()将范围的起点和终点移动到了相同的位置
+            range.moveStart("character", startIndex);
+            //给 moveEnd()传入要选择的字符总数即可
+            range.moveEnd("character", stopIndex - startIndex);
+            range.select();
+        }
+        textbox.focus();
+    }
+    //选择所有文本
+    selectText(textboxThird, 0, textboxThird.value.length); //"Hello world!"
+    //选择前 3 个字符,延迟两秒，方便查看效果
+    setTimeout("selectText(textboxThird, 0, 3)",2000);//"Hel"
+    //选择第 4 到第 6 个字符，延迟5秒，方便查看效果
+    setTimeout("selectText(textboxThird, 4, 7)",5000);//"o w"
+</script>
+</body>
+</html>

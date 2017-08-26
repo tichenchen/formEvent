@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form>
+    <select name="location" id="selLocation" multiple>
+        <option value="Sunnyvale, CA">Sunnyvale</option>
+        <option value="Los Angeles, CA">Los Angeles</option>
+        <option value="Mountain View, CA">Mountain View</option>
+        <option value="">China</option>
+        <option>Australia</option>
+    </select>
+    <a onclick="addOption()">添加项</a>
+    <a onclick="deleteOption()">移除项</a>
+    <a onclick="moveOption()">移除项</a>
+</form>
+<script>
+    var selectbox = document.forms[0]. elements["location"];
+    //推荐
+    var text = selectbox.options[0].text; //选项的文本
+    var value = selectbox.options[0].value; //选项的值
+    alert("第一项的文本："+text+",值为"+value);
+    //selectedIndex设置,允许多选的选择框中
+    //selectedIndex 会导致取消以前的所有选项并选择指定的那一项，而读取 selectedIndex 则只会返回选中项中第一项的索引值
+    //设置选项的 selected 属性，不会取消对其他选中项的选择，因而可以动态选中任意多个项selectbox.options[0].selected = true;
+    var selectedIndex = selectbox.selectedIndex;
+    var selectedOption = selectbox.options[selectedIndex];
+    if(selectedIndex>0){
+        alert("Selected index: " + selectedIndex + "\nSelected text: " +
+                selectedOption.text + "\nSelected value: " + selectedOption.value);
+    }
+
+
+/*
+ 返回给定选择框中选中项的一个数组
+ */
+    function getSelectedOptions(selectbox){
+        var result = new Array();
+        var option = null;
+        for (var i=0, len=selectbox.options.length; i < len; i++){
+            option = selectbox.options[i];
+            if (option.selected){
+                result.push(option);
+            }
+        }
+        return result;
+    }
+    //设置多选的第二项
+    selectbox.options[1].selected = true;
+    var selectedOptions = getSelectedOptions(selectbox);
+    var message = "";
+    for (var i=0, len=selectedOptions.length; i < len; i++){
+        message += "Selected index: " + selectedOptions[i].index +
+                "\nSelected text: " + selectedOptions[i].text +
+                "\nSelected value: " + selectedOptions[i].value + "\n\n";
+    }
+    alert(message);
+
+    /*
+    添加项
+     */
+    function addOption(){
+        var newOptionFirst = document.createElement("option");
+        newOptionFirst.appendChild(document.createTextNode("Option text"));
+        newOptionFirst.setAttribute("value", "Option value");
+        selectbox.appendChild(newOptionFirst);
+        var newOptionSecond = new Option("add second", "add second");
+        selectbox.add(newOptionSecond, undefined); //最佳方案
+        var newOptionThird = new Option("IE8及之前有bug", "IE8及之前中有问题");
+        selectbox.appendChild(newOptionThird); //在 IE8 及之前版本中有问题
+    }
+
+    /*
+    移除项
+     */
+    function deleteOption(){
+        selectbox.removeChild(selectbox.options[0]); //移除第一个选项
+        selectbox.remove(0); //移除第一个选项
+        selectbox.options[0] = null; //移除第一个选项
+    }
+
+    /*
+    移动项
+     */
+    function moveOption(){
+        //向后移动两项
+        var optionToMove = selectbox.options[1];
+        selectbox.insertBefore(optionToMove, selectbox.options[optionToMove.index+2]);
+    }
+</script>
+</body>
+</html>
